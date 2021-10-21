@@ -5,15 +5,26 @@ import (
 	"net/http"
 )
 
-func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		n, err := fmt.Fprintf(w, "Hello World")
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println(fmt.Sprintf("Number of bytes writter: %d", n))
-	})
+const portNumber = ":8080"
 
+// Home functions that handle web request need to handle two parameters a responseWriter and request
+func Home(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "This is the home page")
+}
+
+func About(w http.ResponseWriter, r *http.Request) {
+	sum := addValues(2, 2)
+	_, _ = fmt.Fprintf(w, fmt.Sprintf("This is the about page and 2 + 2 is %d", sum))
+}
+
+func addValues(x, y int) int {
+	return x + y
+}
+
+func main() {
+	http.HandleFunc("/", Home)
+	http.HandleFunc("/about", About)
 	//start a webserver in go
-	_ = http.ListenAndServe(":8080", nil)
+	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
+	_ = http.ListenAndServe(portNumber, nil)
 }
