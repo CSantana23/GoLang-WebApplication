@@ -5,15 +5,30 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"myApp/pkg/config"
 	"myApp/pkg/handlers"
+	"myApp/pkg/render"
 	"net/http"
 )
 
 const portNumber = ":8080"
 
 func main() {
-	http.HandleFunc("/", handlers.Home)
-	http.HandleFunc("/about", handlers.About)
+	var app config.AppConfig
+	tc, err := render.CreateTemplateCache()
+	if err != nil {
+		log.Fatal("cannot create template cache")
+	}
+	app.TemplateCache = tc
+	app.UseCache = false
+
+	repo := handlers.NewRepo(&app)
+	handlers.NewHandlers(repo)
+
+	render.NewTemplates(&app)
+	http.HandleFunc("/", handlers.Repo.Home)
+	http.HandleFunc("/about", handlers.Repo.About)
 
 	//start a webserver in go
 	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
